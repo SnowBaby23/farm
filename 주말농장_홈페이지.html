@@ -1,0 +1,379 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>햇살두렁 주말농장</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700;800&family=Gowun+Dodum&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<style>
+/* Layout: 밭이랑처럼 가로 띠가 쌓이는 구성 — 히어로 / 구획 / 파종 달력 / 시설·규칙 / 신청 */
+:root{
+  --bg:#f2f4ec; --surface:#ffffff; --fg:#22281c; --muted:#5d6652;
+  --leaf:#2f6a3b; --leaf-soft:#dbe8d3; --squash:#d9a21b; --squash-soft:#f6e6b8;
+  --soil:#6b4a2f; --line:#d3d9c7;
+  --f-display:"Hahmlet","Noto Serif KR",serif;
+  --f-body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-data:"IBM Plex Sans KR","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141912; --surface:#1d241a; --fg:#e5e9da; --muted:#a3ad94;
+  --leaf:#8ccc88; --leaf-soft:#27392a; --squash:#e8bd4f; --squash-soft:#3f3417;
+  --soil:#c9a27c; --line:#323c2d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141912; --surface:#1d241a; --fg:#e5e9da; --muted:#a3ad94;
+  --leaf:#8ccc88; --leaf-soft:#27392a; --squash:#e8bd4f; --squash-soft:#3f3417;
+  --soil:#c9a27c; --line:#323c2d; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.7}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h2{font-size:clamp(1.6rem,3.4vw,2.2rem);font-weight:800}
+p{margin:0}
+.eyebrow{font-family:var(--f-data);font-size:.78rem;letter-spacing:.12em;color:var(--leaf);font-weight:600}
+section{padding-block:64px;border-top:1px solid var(--line)}
+.sec-head{display:grid;gap:10px;margin-bottom:32px;max-width:640px}
+.sec-head p{color:var(--muted)}
+a{color:var(--leaf)}
+:focus-visible{outline:3px solid var(--squash);outline-offset:2px}
+
+/* nav */
+header.top{padding-block:18px}
+header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{font-family:var(--f-display);font-weight:800;font-size:1.15rem;display:flex;align-items:center;gap:8px}
+.logo svg{width:26px;height:26px}
+nav ul{display:flex;gap:18px;list-style:none;margin:0;padding:0;flex-wrap:wrap;font-size:.95rem}
+nav a{color:var(--fg);text-decoration:none}
+nav a:hover{color:var(--leaf)}
+
+/* hero */
+.hero{padding-block:40px 64px}
+.hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:end}
+.hero h1{font-size:clamp(2.3rem,6vw,4.1rem);font-weight:800;letter-spacing:-.01em}
+.hero h1 em{font-style:normal;color:var(--leaf)}
+.hero .lead{font-size:1.12rem;color:var(--muted);margin-top:18px;max-width:34ch}
+.badge{display:inline-block;background:var(--squash-soft);color:var(--soil);font-family:var(--f-data);font-weight:600;font-size:.85rem;padding:4px 12px;border-radius:99px;margin-bottom:18px}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.btn{font-family:var(--f-body);font-size:1rem;border:0;cursor:pointer;padding:12px 22px;border-radius:8px;text-decoration:none;display:inline-block}
+.btn-main{background:var(--leaf);color:var(--bg)}
+.btn-ghost{background:transparent;color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn:hover{filter:brightness(1.08)}
+.plot{min-width:0}
+.plot canvas{width:100%;max-width:100%;aspect-ratio:1/1;display:block;border-radius:6px}
+.plot figcaption{font-family:var(--f-data);font-size:.8rem;color:var(--muted);margin-top:8px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:36px;border-top:2px solid var(--fg)}
+.facts div{padding:14px 12px 0 0}
+.facts dt{font-size:.82rem;color:var(--muted)}
+.facts dd{margin:0;font-family:var(--f-data);font-weight:600;font-size:1.05rem;font-variant-numeric:tabular-nums}
+
+/* plots */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.plan{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px;display:grid;gap:14px;align-content:start}
+.plan.rec{border:2px solid var(--leaf)}
+.plan h3{font-size:1.3rem}
+.plan .size{font-family:var(--f-data);color:var(--muted);font-size:.9rem}
+.plan .price{font-family:var(--f-data);font-size:1.7rem;font-weight:600;font-variant-numeric:tabular-nums}
+.plan .price small{font-size:.85rem;color:var(--muted);font-weight:400}
+.plan ul{margin:0;padding-left:1.1em;color:var(--muted);font-size:.95rem}
+.tag{justify-self:start;font-family:var(--f-data);font-size:.75rem;background:var(--leaf);color:var(--bg);padding:2px 10px;border-radius:4px}
+
+/* calendar */
+.cal-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table.cal{border-collapse:collapse;width:100%;min-width:720px;font-family:var(--f-data);font-size:.88rem}
+.cal th,.cal td{border-bottom:1px solid var(--line);padding:0;text-align:center;height:44px}
+.cal thead th{font-weight:600;color:var(--muted);font-size:.8rem;height:38px}
+.cal tbody th{text-align:left;padding:0 14px;font-weight:600;white-space:nowrap;font-family:var(--f-body);font-size:.98rem}
+.cal td{position:relative;border-left:1px dashed var(--line)}
+.cal td span{position:absolute;inset:10px 0;display:block}
+.cal .s span{background:var(--squash)}
+.cal .h span{background:var(--leaf)}
+.cal .g span{background:var(--leaf-soft)}
+.cal tr:last-child th,.cal tr:last-child td{border-bottom:0}
+.legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:14px;font-size:.9rem;color:var(--muted)}
+.legend i{display:inline-block;width:22px;height:10px;margin-right:6px;vertical-align:middle;border-radius:2px}
+.cal-note{margin-top:10px;font-size:.88rem;color:var(--muted)}
+
+/* facilities & rules */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.two > div{min-width:0}
+.fac{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.fac li{display:grid;grid-template-columns:7.5em 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.fac b{font-family:var(--f-data);font-weight:600}
+.rules{margin:0;padding-left:1.3em;display:grid;gap:10px}
+.rules li::marker{font-family:var(--f-data);color:var(--leaf);font-weight:600}
+h3.sub{font-size:1.25rem;margin-bottom:14px}
+
+/* form */
+.apply .wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:48px}
+.apply .wrap > div{min-width:0}
+form{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px;display:grid;gap:16px}
+label{display:grid;gap:6px;font-size:.95rem}
+input,select,textarea{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;width:100%}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font-size:.95rem;margin-bottom:6px}
+.radios{display:flex;gap:10px;flex-wrap:wrap}
+.radios label{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 12px;cursor:pointer}
+.radios input{width:auto}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.total{font-family:var(--f-data);font-variant-numeric:tabular-nums;display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed var(--line);padding-top:14px}
+.total strong{font-size:1.4rem}
+.result{background:var(--leaf-soft);border-radius:8px;padding:16px;font-size:.95rem}
+.err{color:#b3261e;font-size:.88rem}
+:root[data-theme="dark"] .err{color:#ff9b8f}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .err{color:#ff9b8f}}
+.contact{margin-top:24px;display:grid;gap:6px;font-family:var(--f-data)}
+.contact .num{font-size:1.4rem;font-weight:600;user-select:all}
+
+footer{padding-block:32px;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
+
+@media (max-width:820px){
+  .hero .wrap,.two,.apply .wrap{grid-template-columns:1fr;gap:32px}
+  .plans{grid-template-columns:1fr}
+  .plot{max-width:360px}
+}
+@media (max-width:440px){
+  .facts{grid-template-columns:1fr 1fr}
+  .row2{grid-template-columns:1fr}
+  nav ul{gap:12px;font-size:.9rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="logo">
+      <svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="12" fill="var(--squash)"/><path d="M5 18h16M7 14.5h12M9 11h8" stroke="var(--soil)" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      햇살두렁 주말농장
+    </div>
+    <nav aria-label="주요 메뉴"><ul>
+      <li><a href="#plans">분양 안내</a></li>
+      <li><a href="#calendar">파종 달력</a></li>
+      <li><a href="#facility">시설·규칙</a></li>
+      <li><a href="#apply">신청하기</a></li>
+    </ul></nav>
+  </div>
+</header>
+
+<main>
+<div class="hero">
+  <div class="wrap">
+    <div>
+      <span class="badge">2027년 텃밭 분양 접수 중 · 선착순 120구획</span>
+      <h1>주말마다 <em>내 밭</em>에서<br>흙 만지는 하루</h1>
+      <p class="lead">도심에서 차로 20분. 농기구와 퇴비는 농장이 준비하고, 가족은 씨앗과 장갑만 챙겨 오세요.</p>
+      <div class="cta-row">
+        <a class="btn btn-main" href="#apply">분양 신청하기</a>
+        <a class="btn btn-ghost" href="#calendar">무엇을 심을까?</a>
+      </div>
+      <dl class="facts">
+        <div><dt>분양 기간</dt><dd>3월 ~ 11월</dd></div>
+        <div><dt>기본 구획</dt><dd>16.5㎡ (5평)</dd></div>
+        <div><dt>운영 시간</dt><dd>06:00 ~ 19:00</dd></div>
+      </dl>
+    </div>
+    <figure class="plot" style="margin:0">
+      <canvas id="field" width="720" height="720" aria-label="위에서 내려다본 텃밭 구획 그림"></canvas>
+      <figcaption>농장 배치도 · 가로 12구획 × 세로 10줄, 칠해진 칸은 분양 완료</figcaption>
+    </figure>
+  </div>
+</div>
+
+<section id="plans">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">분양 안내</span>
+      <h2>우리 가족에게 맞는 밭 크기</h2>
+      <p>분양료에는 밭갈이, 기본 퇴비, 농기구 대여, 수도 사용료가 모두 포함됩니다. 모종과 씨앗은 각자 준비합니다.</p>
+    </div>
+    <div class="plans">
+      <article class="plan">
+        <h3>한두렁</h3>
+        <div class="size">8.3㎡ (2.5평) · 1~2인</div>
+        <div class="price">60,000원 <small>/ 1년</small></div>
+        <ul><li>상추·쌈채소 위주로 가볍게</li><li>초보 텃밭 교육 1회</li></ul>
+      </article>
+      <article class="plan rec">
+        <span class="tag">가장 많이 선택</span>
+        <h3>가족 텃밭</h3>
+        <div class="size">16.5㎡ (5평) · 3~4인</div>
+        <div class="price">100,000원 <small>/ 1년</small></div>
+        <ul><li>감자·고추·토마토까지 한 해 농사</li><li>초보 텃밭 교육 2회</li><li>이름표 말뚝 제공</li></ul>
+      </article>
+      <article class="plan">
+        <h3>넉넉한 밭</h3>
+        <div class="size">33㎡ (10평) · 모임·2가구</div>
+        <div class="price">180,000원 <small>/ 1년</small></div>
+        <ul><li>가을 김장 배추·무까지</li><li>초보 텃밭 교육 2회</li><li>개인 농기구 보관함 1칸</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="calendar">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">파종 달력</span>
+      <h2>언제 심고, 언제 거둘까</h2>
+      <p>중부 내륙 기준 일정입니다. 칸 하나가 한 달의 상순·하순 반달입니다.</p>
+    </div>
+    <div class="cal-scroll" tabindex="0" aria-label="작물별 월간 파종·수확 표, 가로로 스크롤할 수 있습니다">
+      <table class="cal" id="cal"></table>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--squash)"></i>파종·아주심기</span>
+      <span><i style="background:var(--leaf-soft)"></i>자라는 기간</span>
+      <span><i style="background:var(--leaf)"></i>수확</span>
+    </div>
+    <p class="cal-note">마늘은 10월 하순에 심어 이듬해 6월에 거둡니다. 겨울 동안 밭을 유지하려면 다음 해 분양을 연장해 주세요.</p>
+  </div>
+</section>
+
+<section id="facility">
+  <div class="wrap two">
+    <div>
+      <h3 class="sub">농장 시설</h3>
+      <ul class="fac">
+        <li><b>농기구</b><span>호미·삽·괭이·물뿌리개 무료 대여 (관리동 옆 창고)</span></li>
+        <li><b>물</b><span>구획마다 15m 이내 수도꼭지, 지하수 사용</span></li>
+        <li><b>퇴비·비료</b><span>봄 밭갈이 때 기본 퇴비 살포, 추가분은 1포 5,000원</span></li>
+        <li><b>쉼터</b><span>그늘막 평상, 화장실, 손 씻는 곳</span></li>
+        <li><b>주차</b><span>40대 무료 주차, 주말 오전 혼잡</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="sub">함께 지키는 규칙</h3>
+      <ol class="rules">
+        <li>화학 농약과 제초제는 쓰지 않습니다. 친환경 자재만 허용합니다.</li>
+        <li>4주 넘게 관리하지 않은 밭은 연락 후 정리될 수 있습니다.</li>
+        <li>수확 후 남은 줄기와 비닐은 지정 수거장에 모아 주세요.</li>
+        <li>옆 구획 경계(두렁)를 넘어 심지 않습니다.</li>
+        <li>반려동물은 목줄을 하고 밭 안으로는 들어오지 않습니다.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section id="apply" class="apply">
+  <div class="wrap">
+    <div>
+      <div class="sec-head" style="margin-bottom:0">
+        <span class="eyebrow">신청하기</span>
+        <h2>2027년 분양 신청</h2>
+        <p>양식을 작성하면 신청 내용과 분양료를 바로 확인할 수 있습니다. 접수는 아래 번호로 전화하거나 관리동을 방문해 확정됩니다.</p>
+      </div>
+      <div class="contact">
+        <span>접수 전화 (평일 09:00~18:00)</span>
+        <span class="num" id="phone">033-000-0000</span>
+        <button class="btn btn-ghost" type="button" id="copy" style="justify-self:start">번호 복사</button>
+      </div>
+    </div>
+    <form id="form" novalidate>
+      <label for="name">신청자 이름<input id="name" name="name" autocomplete="name" placeholder="예: 김햇살"></label>
+      <fieldset>
+        <legend>구획 크기</legend>
+        <div class="radios">
+          <label><input type="radio" name="plan" id="p1" value="한두렁|60000"> 한두렁</label>
+          <label><input type="radio" name="plan" id="p2" value="가족 텃밭|100000" checked> 가족 텃밭</label>
+          <label><input type="radio" name="plan" id="p3" value="넉넉한 밭|180000"> 넉넉한 밭</label>
+        </div>
+      </fieldset>
+      <div class="row2">
+        <label for="count">구획 수<select id="count"><option>1</option><option>2</option></select></label>
+        <label for="edu">초보 교육 참석<select id="edu"><option value="yes">참석</option><option value="no">불참</option></select></label>
+      </div>
+      <label for="crops">심고 싶은 작물 (선택)<input id="crops" placeholder="예: 상추, 방울토마토, 고추"></label>
+      <div class="total"><span>예상 분양료</span><strong id="sum">100,000원</strong></div>
+      <p class="err" id="err" hidden>신청자 이름을 입력해 주세요.</p>
+      <button class="btn btn-main" type="submit">신청 내용 확인</button>
+      <div class="result" id="result" hidden></div>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">햇살두렁 주말농장 · 이 페이지의 농장명, 요금, 연락처는 예시입니다.</div></footer>
+
+<script>
+/* 파종 달력: 3월~11월, 반달 단위(18칸). 각 작물은 [시작칸, 끝칸, 종류] 목록 */
+const months=[3,4,5,6,7,8,9,10,11];
+const crops=[
+  ["감자",[[1,1,"s"],[2,6,"g"],[7,7,"h"]]],
+  ["상추",[[2,3,"s"],[4,4,"g"],[5,9,"h"],[11,11,"s"],[12,15,"h"]]],
+  ["고추",[[4,4,"s"],[5,7,"g"],[8,14,"h"]]],
+  ["토마토",[[4,4,"s"],[5,7,"g"],[8,11,"h"]]],
+  ["고구마",[[4,5,"s"],[6,12,"g"],[13,15,"h"]]],
+  ["배추",[[11,11,"s"],[12,15,"g"],[16,16,"h"]]],
+  ["무",[[11,11,"s"],[12,14,"g"],[15,16,"h"]]],
+  ["마늘",[[15,15,"s"],[16,17,"g"]]]
+];
+(function(){
+  const t=document.getElementById("cal");
+  let h="<thead><tr><th scope='col'>작물</th>";
+  months.forEach(m=>h+=`<th scope='col' colspan='2'>${m}월</th>`);
+  h+="</tr></thead><tbody>";
+  const names={s:"파종",g:"생육",h:"수확"};
+  crops.forEach(([n,spans])=>{
+    const cells=Array(18).fill("");
+    spans.forEach(([a,b,k])=>{for(let i=a;i<=b;i++)cells[i]=k});
+    h+=`<tr><th scope='row'>${n}</th>`;
+    cells.forEach((k,i)=>{const m=months[i>>1],half=i%2?"하순":"상순";
+      h+=k?`<td class='${k}' title='${m}월 ${half} · ${names[k]}'><span></span></td>`:"<td></td>"});
+    h+="</tr>";
+  });
+  t.innerHTML=h+"</tbody>";
+})();
+
+/* 히어로 배치도: 구획 격자를 캔버스로 그림 */
+(function(){
+  const c=document.getElementById("field"),x=c.getContext("2d");
+  const css=getComputedStyle(document.documentElement);
+  const col=v=>css.getPropertyValue(v).trim();
+  const W=720,cols=12,rows=10,pad=30,gap=8;
+  const cw=(W-pad*2-gap*(cols-1))/cols, ch=(W-pad*2-gap*(rows-1))/rows;
+  let seed=7; const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;
+  x.fillStyle=col("--soil"); x.globalAlpha=.16; x.fillRect(0,0,W,W); x.globalAlpha=1;
+  for(let r=0;r<rows;r++)for(let k=0;k<cols;k++){
+    const px=pad+k*(cw+gap), py=pad+r*(ch+gap), taken=rnd()<.62;
+    if(r===4){ // 가운데 통로
+      x.fillStyle=col("--line"); x.fillRect(px,py+ch*.3,cw,ch*.4); continue;
+    }
+    x.fillStyle=taken?col("--leaf"):col("--surface");
+    x.globalAlpha=taken?(.55+rnd()*.45):1;
+    x.fillRect(px,py,cw,ch); x.globalAlpha=1;
+    if(taken){x.strokeStyle=col("--bg");x.lineWidth=2;
+      for(let l=1;l<3;l++){x.beginPath();x.moveTo(px+4,py+ch*l/3);x.lineTo(px+cw-4,py+ch*l/3);x.stroke()}}
+    else{x.strokeStyle=col("--soil");x.globalAlpha=.4;x.lineWidth=1.5;x.strokeRect(px+.75,py+.75,cw-1.5,ch-1.5);x.globalAlpha=1}
+  }
+  x.fillStyle=col("--squash"); x.beginPath(); x.arc(W-pad-14,pad+ch*4.5+gap*4,12,0,7); x.fill();
+})();
+
+/* 신청 양식 */
+(function(){
+  const f=document.getElementById("form"),sum=document.getElementById("sum"),
+    err=document.getElementById("err"),res=document.getElementById("result");
+  const won=n=>n.toLocaleString("ko-KR")+"원";
+  function calc(){
+    const [label,price]=f.querySelector("input[name=plan]:checked").value.split("|");
+    const n=+document.getElementById("count").value;
+    return {label,total:+price*n,n};
+  }
+  f.addEventListener("input",()=>{sum.textContent=won(calc().total)});
+  f.addEventListener("submit",e=>{
+    e.preventDefault();
+    const name=document.getElementById("name").value.trim();
+    if(!name){err.hidden=false;res.hidden=true;document.getElementById("name").focus();return}
+    err.hidden=true;
+    const {label,total,n}=calc(),crops=document.getElementById("crops").value.trim();
+    const edu=document.getElementById("edu").value==="yes"?"참석":"불참";
+    res.innerHTML=`<b>${name.replace(/[<>&]/g,"")}</b> 님의 신청 내용<br>${label} ${n}구획 · 초보 교육 ${edu}${crops?" · 희망 작물: "+crops.replace(/[<>&]/g,""):""}<br>분양료 <b>${won(total)}</b><br>아직 접수 전입니다. 접수 전화로 이 내용을 알려 주시면 구획 번호를 배정해 드립니다.`;
+    res.hidden=false;
+  });
+  document.getElementById("copy").addEventListener("click",function(){
+    const b=this,num=document.getElementById("phone").textContent;
+    navigator.clipboard.writeText(num).then(()=>{b.textContent="복사됨"},()=>{
+      const r=document.createRange();r.selectNodeContents(document.getElementById("phone"));
+      const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent="번호가 선택됨";
+    });
+  });
+})();
+</script>
+</html>
